@@ -1,15 +1,29 @@
 name: CI
 on:
+  workflow_dispatch:
   push:
     branches: [main, develop]
   pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
+  verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm install
-      - run: npm run check
+          cache: npm
+      - name: Install dependencies
+        run: npm install
+      - name: Typecheck, tests, and production build
+        run: npm run check
