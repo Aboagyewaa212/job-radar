@@ -1,1 +1,4 @@
 project_id = "jtrzwipsgiiaqcfqeqmh"
+
+[functions.ingest-job-scan]
+verify_jwt = false

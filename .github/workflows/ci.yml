@@ -1,15 +1,33 @@
 name: CI
 on:
+  workflow_dispatch:
   push:
     branches: [main, develop]
   pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
+  verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
-      - run: npm install
-      - run: npm run check
+          node-version: 24.15.0
+          cache: npm
+      - name: Use pinned npm
+        run: npm install --global npm@12.0.2
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Full dependency audit
+        run: npm audit --audit-level=low
+      - name: Typecheck, tests, and production build
+        run: npm run check
