@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 type Policy={title:string;updated:string;sections:Array<[string,string]>}
 const policies:Record<string,Policy>={
@@ -9,4 +9,4 @@ const policies:Record<string,Policy>={
   refunds:{title:'Refund policy',updated:'10 September 2026',sections:[['No paid plan currently','Job Radar does not currently sell subscriptions, credits, or other paid products, so there are no customer payments to refund.'],['If payments are introduced','Before accepting payment, the operator should publish pricing, cancellation, refund eligibility, billing contact information, and any legally required cooling-off or consumer rights for the relevant market.']]},
 }
 
-export default function PolicyPage(){const{slug='privacy'}=useParams();const policy=policies[slug]??policies.privacy;return <main className="policyPage"><a className="skipLink" href="#policy">Skip to content</a><div className="policyTop"><Link to="/" className="publicBrand"><span className="brandMark">J</span><b>Job Radar</b></Link><Link className="btn secondary" to="/">Back home</Link></div><article id="policy"><p className="eyebrow">POLICY</p><h1>{policy.title}</h1><p className="muted">Last updated {policy.updated}</p>{policy.sections.map(([title,body])=><section key={title}><h2>{title}</h2><p>{body}</p></section>)}</article></main>}
+export default function PolicyPage({slug}:{slug:keyof typeof policies}){const policy=policies[slug];return <main className="policyPage"><a className="skipLink" href="#policy">Skip to content</a><div className="policyTop"><Link to="/" className="publicBrand"><span className="brandMark">J</span><b>Job Radar</b></Link><Link className="btn secondary" to="/">Back home</Link></div><article id="policy"><p className="eyebrow">POLICY</p><h1>{policy.title}</h1><p className="muted">Last updated {policy.updated}</p>{policy.sections.map(([title,body])=><section key={title}><h2>{title}</h2><p>{body}</p></section>)}</article></main>}
