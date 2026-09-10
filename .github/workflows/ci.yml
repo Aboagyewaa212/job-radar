@@ -27,7 +27,7 @@ jobs:
       - name: Regenerate dependencies and lockfile
         run: rm -f package-lock.json && npm install
       - name: Full dependency audit
-        run: npm audit --audit-level=high
+        run: npm audit --audit-level=low
       - name: Typecheck, tests, and production build
         run: npm run check
       - name: Capture patched lockfile
