@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: 22.12.0
       - name: Regenerate dependencies and lockfile
-        run: npm install
+        run: rm -f package-lock.json && npm install
       - name: Full dependency audit
         run: npm audit --audit-level=high
       - name: Typecheck, tests, and production build
