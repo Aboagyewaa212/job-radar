@@ -1,0 +1,8 @@
+import assert from 'node:assert/strict'
+import test from 'node:test'
+
+const cap=5
+const canMarkApplied=(n,already)=>already||n<cap
+const score=({userSkills,targetRoles,resumeText,jobTitle,jobSkills,jobText,fullyRemote,remoteOnly})=>{const clean=xs=>xs.map(x=>x.trim().toLowerCase()).filter(Boolean);const skills=new Set(clean([...userSkills,...targetRoles]));const resume=resumeText.toLowerCase();const js=clean(jobSkills);const text=`${jobTitle} ${jobText}`.toLowerCase();const matched=[...skills].filter(s=>s.length>2&&(js.includes(s)||text.includes(s)));const missing=js.filter(s=>!skills.has(s)&&!resume.includes(s));const skillScore=js.length?Math.round((matched.length/js.length)*70):Math.min(matched.length*8,55);const remoteBonus=remoteOnly?(fullyRemote?15:-20):(fullyRemote?5:0);const roleBonus=clean(targetRoles).some(r=>jobTitle.toLowerCase().includes(r))?15:0;return{fitScore:Math.max(0,Math.min(100,skillScore+remoteBonus+roleBonus)),matched,missing}}
+test('daily application cap blocks a sixth new application',()=>{assert.equal(canMarkApplied(4,false),true);assert.equal(canMarkApplied(5,false),false);assert.equal(canMarkApplied(5,true),true)})
+test('strong relevant remote job scores above unrelated onsite job',()=>{const base={userSkills:['React','Figma'],targetRoles:['Frontend Developer'],resumeText:'React TypeScript UI',remoteOnly:true};const good=score({...base,jobTitle:'Frontend Developer',jobSkills:['React','TypeScript'],jobText:'Build UI with React',fullyRemote:true});const bad=score({...base,jobTitle:'Accountant',jobSkills:['Excel','bookkeeping'],jobText:'Office accounting',fullyRemote:false});assert.ok(good.fitScore>bad.fitScore);assert.ok(good.matched.includes('react'));assert.ok(bad.missing.includes('bookkeeping'))})

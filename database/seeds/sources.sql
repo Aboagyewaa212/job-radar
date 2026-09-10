@@ -1,0 +1,3 @@
+-- Add only sources whose public listings and application destinations can be verified.
+-- Example pattern (leave disabled until ingestion adapters are configured):
+-- insert into public.job_sources(name,source_type,base_url,verified) values ('Company Careers','company_site','https://example.com/careers',true);
