@@ -12,6 +12,7 @@ export type RadarJob = {
   requirements: string[]
   skills: string[]
   application_url: string
+  canonical_url: string | null
   application_method: string | null
   application_email: string | null
   application_instructions: string[]
