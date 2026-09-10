@@ -17,6 +17,7 @@ export type RadarJob = {
   application_email: string | null
   application_instructions: string[]
   posted_at: string | null
+  expires_at: string | null
   last_verified_at: string
   source_count: number
   job_sources?: { name: string } | null
