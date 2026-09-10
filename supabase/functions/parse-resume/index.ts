@@ -1,7 +1,7 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2.116.0/cors'
 import { createClient } from 'npm:@supabase/supabase-js@2.116.0'
 import { extractText } from 'npm:unpdf@1.8.1'
-import { unzipSync } from 'npm:fflate@0.8.2'
+import { unzipSync } from 'npm:fflate@0.8.3'
 
 const MAX_FILE_BYTES=10*1024*1024,MAX_DOC_XML_BYTES=2*1024*1024
 const json=(body:unknown,status=200)=>new Response(JSON.stringify(body),{status,headers:{...corsHeaders,'Content-Type':'application/json'}})
