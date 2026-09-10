@@ -1,12 +1,27 @@
 # Job Radar
 
-A multi-user career intelligence app that matches verified jobs to each user's CV, experience, skills and target fields. The codebase is intentionally portable: React/TypeScript frontend, Supabase backend, SQL migrations, Edge Functions, tests, Docker and GitHub Actions all live in one repository.
+A multi-user career intelligence app that matches verified jobs to each user's CV, experience, skills and target fields. React/TypeScript, Supabase, SQL migrations, Edge Functions, tests, Docker and GitHub Actions are versioned together.
 
 ## Current implementation
 
-Implemented: Supabase Auth integration, per-user profiles/preferences, private resume storage, shared jobs/sources, personalized match records, saved jobs, application stages, server-enforced daily application cap (maximum 5), closed-job history visibility, Resume Studio shell, responsive dashboard, light-first design language, source-controlled migrations, matching Edge Function, deterministic truthful resume-tailoring fallback, business-rule tests and CI configuration.
+Implemented now:
+- Supabase email/password authentication and per-user onboarding
+- profiles, career preferences and private resume storage with RLS
+- personalized job matching, “why you match” evidence and skill gaps
+- saved jobs and application-stage tracking
+- configurable daily application goal with a hard server-side maximum of 5
+- truthful Resume Studio fallback that never invents credentials
+- browser-safe CORS/auth handling for user Edge Functions
+- verified ingestion from Remote OK and Arbeitnow with source attribution
+- duplicate prevention by `(source_id, external_id)`
+- Supabase Cron daily ingestion at 05:15 UTC with a 6-hour server cooldown
+- responsive dashboard, loading/empty/error states
+- source-controlled Supabase migrations and functions
+- backend business-rule tests and GitHub Actions verification
 
-Not yet enabled in production: automated external job-source adapters, rich PDF/DOCX text extraction, outbound notifications and LLM-powered rewriting. Their boundaries already exist under `supabase/functions/`; they require source/provider configuration and should not be faked or exposed insecurely.
+The first live ingestion smoke test completed successfully on 2026-09-10 and imported 699 feed records, resulting in 698 active deduplicated jobs.
+
+Still intentionally pending: rich PDF/DOCX extraction, outbound push/email notifications, additional provider-specific source adapters, and optional LLM rewriting. Plain-text resumes parse now; PDF/DOCX uploads remain stored privately and matching falls back to the user's supplied skills/target roles rather than fabricating resume contents.
 
 ## Repository structure
 
@@ -17,55 +32,41 @@ Not yet enabled in production: automated external job-source adapters, rich PDF/
 - `docker/` local container notes
 - `.github/workflows/` CI
 
-## Hosted Supabase project
+## Localhost
 
-Project ref: `jtrzwipsgiiaqcfqeqmh`
-
-The frontend reads these environment variables:
+Requirements: Node 22.12+ and npm. The included `.env.example` contains the hosted project's public URL and **publishable** browser key (not a secret key).
 
 ```bash
-VITE_SUPABASE_URL=https://jtrzwipsgiiaqcfqeqmh.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=your_publishable_key
-```
-
-Never put a Supabase secret key/service-role key in frontend code or Git.
-
-## Local development
-
-Requirements: Node 22+, npm, Docker Desktop (or another Docker-compatible runtime), Supabase CLI.
-
-```bash
+git clone https://github.com/Aboagyewaa212/job-radar.git
+cd job-radar
+git checkout develop
 cp .env.example .env.local
 npm install
 npm run dev
 ```
 
-To run the Supabase stack locally:
+Then open `http://localhost:5173`.
 
-```bash
-supabase start
-supabase db reset
-```
-
-To link this repository to the already-created hosted project:
-
-```bash
-supabase link --project-ref jtrzwipsgiiaqcfqeqmh
-```
-
-## Quality checks
+To run all available checks:
 
 ```bash
 npm run check
-node --test backend/tests/business-rules.test.mjs
 ```
 
-CI runs typecheck, unit tests and production build on pushes/PRs to `main` and `develop`.
+To run the Supabase stack itself locally instead of using the hosted backend, install Docker and Supabase CLI, then use `supabase start` / `supabase db reset`. The normal frontend localhost workflow above intentionally uses the already-created hosted Job Radar backend.
 
-## Versioning
+## Hosted Supabase project
 
-Use `main` for stable releases, `develop` for integrated work, and `feature/*` branches for isolated features. The initial local tag is `v0.1.0`.
+Project ref: `jtrzwipsgiiaqcfqeqmh`
+
+Never put a Supabase secret/service-role key in frontend code or Git. The `sb_publishable_...` key used by the Vite frontend is designed to be public and all user data access remains enforced by RLS.
+
+## CI and versioning
+
+CI supports push, pull request and manual `workflow_dispatch` triggers and runs Node 22, dependency install, TypeScript checking, backend tests, UI tests (when present), and a production Vite build.
+
+Use `main` for stable releases, `develop` for integrated work, and `feature/*` branches for isolated features. Move to `npm ci` plus dependency caching once a generated `package-lock.json` is committed.
 
 ## Product principles
 
-The interface is a compact "precision radar": crisp hierarchy, restrained ink-and-paper surfaces, modest radii, compact metadata, DM Serif Display for editorial emphasis, IBM Plex Sans for UI, IBM Plex Mono for scores/labels, and electric blue as the primary signal color. Figma remains the visual source of truth; this repository remains the implementation source of truth.
+The interface is a compact “precision radar”: crisp hierarchy, restrained ink-and-paper surfaces, compact metadata, DM Serif Display for editorial emphasis, IBM Plex Sans for UI, IBM Plex Mono for scores/labels, and electric blue as the primary signal color. Figma remains the visual source of truth; this repository remains the implementation source of truth.
