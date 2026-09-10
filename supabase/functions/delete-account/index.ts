@@ -18,13 +18,12 @@ Deno.serve(async(req:Request)=>{
   const{data:{user},error:userError}=await client.auth.getUser(token)
   if(userError||!user)return json({error:'Unauthorized'},401)
 
-  for(let offset=0;;){
-    const{data:files,error:listError}=await admin.storage.from('resumes').list(user.id,{limit:100,offset,sortBy:{column:'name',order:'asc'}})
+  for(;;){
+    const{data:files,error:listError}=await admin.storage.from('resumes').list(user.id,{limit:100,offset:0,sortBy:{column:'name',order:'asc'}})
     if(listError)return json({error:'Could not enumerate private resume files'},500)
     const names=(files??[]).filter(file=>file.name&&file.id).map(file=>`${user.id}/${file.name}`)
     if(names.length){const{error:removeError}=await admin.storage.from('resumes').remove(names);if(removeError)return json({error:'Could not remove private resume files'},500)}
     if((files??[]).length<100)break
-    offset+=100
   }
 
   const{error:deleteError}=await admin.auth.admin.deleteUser(user.id)
