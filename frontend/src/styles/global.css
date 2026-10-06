@@ -15,3 +15,35 @@
 .sidebar nav a{position:relative}
 .sidebar nav a.active:before{content:'';position:absolute;left:0;width:2px;height:18px;background:#7da0ff;border-radius:2px}
 @media(prefers-reduced-motion:reduce){.jobCard,.btn{transition:none}.jobCard:hover,.btn:not(:disabled):hover{transform:none}}
+
+/* Editorial landing: restrained, flat, grid-led */
+.landingPage{background:#f7f7f5}
+.landingNav{max-width:1360px;padding:22px 32px;border-bottom:1px solid #dfe1e5}
+.landingNav nav a,.plainLink{font-size:.82rem;color:#4f5662}
+.landingNav nav a:hover,.plainLink:hover{color:var(--fg)}
+.landingActions{gap:22px}
+.heroSection{max-width:1360px;padding:112px 32px 80px}
+.heroSection h1{max-width:1080px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:clamp(3.4rem,7.2vw,7.2rem);font-weight:520;line-height:.94;letter-spacing:-.065em;margin:18px 0 58px}
+.heroLower{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,520px);gap:72px;align-items:end;border-top:1px solid #cfd3d9;padding-top:24px}
+.heroCopy{grid-column:2;font-size:1rem;line-height:1.6;margin:0}
+.heroActions{grid-column:2;margin-top:6px;align-items:center;gap:18px}
+.productStrip{max-width:1360px;margin:0 auto;padding:20px 32px;border-top:1px solid #d7d9dd;border-bottom:1px solid #d7d9dd;display:flex;justify-content:space-between;gap:28px;font-size:.76rem}
+.productStrip p{margin:0;font-weight:650}
+.productStrip>div{display:flex;gap:26px;flex-wrap:wrap;color:#555e6a}
+.productStrip span{display:flex;align-items:center;gap:6px}
+.landingSection{max-width:1360px;padding:110px 32px}
+.sectionIntro{display:grid;grid-template-columns:1fr 2fr;gap:40px;margin-bottom:54px}
+.sectionIntro h2,.landingClosing h2{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-weight:500;letter-spacing:-.035em}
+.sectionIntro h2{font-size:clamp(2rem,4vw,4rem);max-width:780px;margin:0}
+.featureGrid{grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid #cfd3d9;border-bottom:1px solid #cfd3d9}
+.featureCard{position:relative;border:0;border-right:1px solid #cfd3d9;border-radius:0;box-shadow:none;background:transparent;padding:28px 32px 34px;min-height:280px}
+.featureCard:last-child{border-right:0}
+.featureCard:hover{transform:none;box-shadow:none}
+.featureCard .featureIndex{font:600 .66rem ui-monospace,SFMono-Regular,Menlo,monospace;color:#8a929e;margin-bottom:64px}
+.featureCard h3{font-size:1.05rem;margin:24px 0 10px}
+.featureCard p{font-size:.88rem;line-height:1.6;max-width:330px}
+.landingClosing{max-width:1360px;margin:0 auto;padding:74px 32px 96px;border-top:1px solid #cfd3d9;display:grid;grid-template-columns:1fr 2fr;gap:36px;align-items:start}
+.landingClosing h2{font-size:clamp(2rem,3.8vw,3.7rem);max-width:760px;margin:0}
+.landingClosing .btn{grid-column:2;justify-self:start;margin-top:4px}
+.publicFooter{max-width:1360px}
+@media(max-width:760px){.heroSection{padding:72px 18px 52px}.heroSection h1{font-size:clamp(3rem,15vw,5.2rem);margin-bottom:40px}.heroLower,.sectionIntro,.landingClosing{grid-template-columns:1fr;gap:22px}.heroCopy,.heroActions,.landingClosing .btn{grid-column:1}.productStrip{padding:18px;display:grid}.productStrip>div{gap:12px 20px}.landingSection{padding:72px 18px}.featureGrid{grid-template-columns:1fr}.featureCard{border-right:0;border-bottom:1px solid #cfd3d9;min-height:0;padding:24px 0}.featureCard:last-child{border-bottom:0}.featureCard .featureIndex{margin-bottom:34px}.landingClosing{padding:54px 18px 70px}.landingNav{padding:14px 18px}}
