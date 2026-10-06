@@ -13,7 +13,7 @@ export default function LandingPage(){
     <main id="main">
       <section className="radrHero">
         <div className="heroCopyBlock"><h1>Find the work worth your attention.</h1><p>RADR reads the signals already in your CV, combines them with what you want next, and turns a noisy job market into a shortlist you can act on.</p><Link className="btn primary heroCta" to="/auth?mode=signup">Start your RADR</Link></div>
-        <figure className="heroPhoto"><img src={HERO_IMAGE} alt="Black woman wearing headphones while working on a laptop at a desk"/><figcaption>Remote work, without the endless search.</figcaption></figure>
+        <figure className="heroPhoto"><img src={HERO_IMAGE} alt="Black woman wearing headphones while working on a laptop at a desk"/></figure>
       </section>
       <section className="productFlow">
         <article><span>1</span><h2>Add your CV</h2><p>Your experience becomes part of the search rather than a file you only use at the end.</p></article>
