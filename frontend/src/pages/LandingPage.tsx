@@ -1,16 +1,9 @@
-import {useState} from 'react'
 import {Link} from 'react-router-dom'
 import {RadrLogo} from '../components/RadrLogo'
 
-const preview=[
-  {title:'Project Coordinator',company:'Northstar',fit:94,reason:'Project coordination · Notion · stakeholder communication'},
-  {title:'Community Manager',company:'Common Ground',fit:91,reason:'Community management · content · events'},
-  {title:'Operations Associate',company:'Studio North',fit:89,reason:'Google Workspace · documentation · coordination'},
-]
+const HERO_IMAGE='https://images.unsplash.com/photo-1758874384552-5d090a98033b?auto=format&fit=crop&fm=jpg&q=82&w=1800'
 
 export default function LandingPage(){
-  const[selected,setSelected]=useState(0)
-  const job=preview[selected]
   return <div className="landingPage">
     <a className="skipLink" href="#main">Skip to main content</a>
     <header className="landingNav">
@@ -20,11 +13,7 @@ export default function LandingPage(){
     <main id="main">
       <section className="radrHero">
         <div className="heroCopyBlock"><h1>Find the work worth your attention.</h1><p>RADR reads the signals already in your CV, combines them with what you want next, and turns a noisy job market into a shortlist you can act on.</p><Link className="btn primary heroCta" to="/auth?mode=signup">Start your RADR</Link></div>
-        <div className="radarDemo" aria-label="Interactive RADR preview">
-          <div className="radarDemoTop"><RadrLogo compact/><span>Today</span></div>
-          <div className="demoList">{preview.map((item,index)=><button type="button" className={index===selected?'selected':''} key={item.title} onClick={()=>setSelected(index)}><span><b>{item.title}</b><small>{item.company}</small></span><strong>{item.fit}%</strong></button>)}</div>
-          <div className="demoReason"><b>Why it surfaced</b><p>{job.reason}</p></div>
-        </div>
+        <figure className="heroPhoto"><img src={HERO_IMAGE} alt="Black woman wearing headphones while working on a laptop at a desk"/></figure>
       </section>
       <section className="productFlow">
         <article><span>1</span><h2>Add your CV</h2><p>Your experience becomes part of the search rather than a file you only use at the end.</p></article>
