@@ -91,7 +91,7 @@ export default function AuthPage(){
         {mode==='reset-password'&&recoveryReady===true&&<label>Confirm password<input type="password" autoComplete="new-password" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} minLength={8} required/></label>}
         {mode==='signup'&&<label className="consentRow"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} required/><span>I agree to the <Link to="/terms">Terms</Link> and <Link to="/privacy">Privacy Policy</Link>.</span></label>}
         {mode==='login'&&<button className="forgotLink" type="button" onClick={()=>{setMode('forgot');setError('');setMessage('')}}>Forgot password?</button>}
-        {error&&mode!=='reset-password'&&<p className="error" role="alert">{error}</p>}
+        {error&&(mode!=='reset-password'||recoveryReady===true)&&<p className="error" role="alert">{error}</p>}
         {message&&<p className="status" role="status">{message}</p>}
         {(mode!=='reset-password'||recoveryReady===true)&&<button className="btn primary authSubmit" disabled={busy||recoveryReady===null}>{busy?'Working…':mode==='signup'?'Create account':mode==='login'?'Sign in':mode==='forgot'?'Send reset link':'Update password'}</button>}
         {mode==='forgot'&&<button className="textButton" type="button" onClick={()=>setMode('login')}>Back to sign in</button>}
