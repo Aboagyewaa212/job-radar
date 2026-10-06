@@ -101,17 +101,18 @@ p{line-height:1.6}
 .consentRow input,.check input,.inlineControl input{width:auto;margin-top:3px}
 
 /* shell */
-.appShell{display:grid;grid-template-columns:228px minmax(0,1fr);min-height:100vh}
-.sidebar{position:sticky;top:0;height:100vh;background:var(--plum);color:#fff;padding:24px 20px;display:flex;flex-direction:column}
+.appShell{display:grid;grid-template-columns:228px minmax(0,1fr);min-height:100vh;background:var(--paper)}
+.sidebar{position:sticky;top:0;height:100vh;background:var(--plum);color:#fff;padding:24px 20px;display:flex;flex-direction:column;z-index:20}
 .sidebarBrand{padding:5px 14px 38px;display:block}
 .sidebarNav,.sidebarUtility{display:grid;gap:2px}
 .sidebarNav a,.sidebarUtility a,.sidebarUtility button{display:block;width:100%;border:0;background:transparent;color:#fff;text-align:left;padding:11px 14px;min-height:42px;font-size:.9rem;font-weight:560;border-left:3px solid transparent}
 .sidebarNav a:hover,.sidebarUtility a:hover,.sidebarUtility button:hover{background:rgba(255,255,255,.08)}
 .sidebarNav a.active,.sidebarUtility a.active{border-left-color:var(--rose);background:rgba(255,255,255,.08)}
 .sidebarUtility{margin-top:auto;border-top:1px solid rgba(255,255,255,.24);padding-top:12px}
-.main{padding:44px clamp(24px,5vw,72px) 70px;max-width:1500px;width:100%;min-width:0}
-.pageHeader{display:flex;justify-content:space-between;align-items:center;gap:24px;margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid var(--line)}
-.cleanHeader h1{font-size:clamp(2.4rem,4.3vw,4.2rem);margin:0}
+.main{width:100%;min-width:0;max-width:none;padding:0 0 70px;background:var(--paper)}
+.main>.pageHeader{min-height:78px;margin:0 0 28px;padding:0 clamp(24px,4vw,52px);background:var(--surface);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:24px}
+.cleanHeader h1{font-size:1.45rem;line-height:1.1;margin:0;letter-spacing:-.025em}
+.main>:not(.pageHeader){margin-left:clamp(24px,4vw,52px);margin-right:clamp(24px,4vw,52px)}
 .modalBackdrop{position:fixed;inset:0;background:rgba(17,17,17,.42);display:grid;place-items:center;z-index:100;padding:24px}
 .logoutDialog{width:min(520px,100%);background:var(--surface);padding:34px;border:1px solid #111}
 .logoutDialog h2{font-size:1.8rem}
@@ -235,7 +236,9 @@ input:focus,textarea:focus,select:focus{border-color:var(--rose);box-shadow:0 0 
   .sidebarBrand .radrWord{display:none}
   .sidebarNav a,.sidebarUtility a,.sidebarUtility button{font-size:0;padding:11px 9px;text-align:center}
   .sidebarNav a:before,.sidebarUtility a:before,.sidebarUtility button:before{font-size:.68rem;content:'•'}
-  .main{padding:30px 18px 60px}
+  .main{padding:0 0 60px}
+  .main>.pageHeader{min-height:70px;padding:0 18px;margin-bottom:22px}
+  .main>:not(.pageHeader){margin-left:18px;margin-right:18px}
   .authPage{grid-template-columns:1fr}
   .authBrand{min-height:300px;padding:36px 28px}
   .authBrandMessage h1{font-size:3rem}
@@ -260,8 +263,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--rose);box-shadow:0 0 
   .dashboardStats{grid-template-columns:1fr}
   .statBlock{border-right:0;border-bottom:1px solid var(--line)}
   .statBlock:last-child{border-bottom:0}
-  .pageHeader{align-items:flex-start}
-  .cleanHeader h1{font-size:2.5rem}
+  .main>.pageHeader{align-items:center}
+  .cleanHeader h1{font-size:1.35rem}
   .kanban{grid-template-columns:1fr}
   .actions{flex-wrap:wrap}
   .settingsRows>div{grid-template-columns:1fr;gap:8px}
