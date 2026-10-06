@@ -16,10 +16,10 @@ export default function AuthPage(){
   const[mode,setMode]=useState<Mode>(initial)
   const[email,setEmail]=useState('');const[password,setPassword]=useState('');const[confirmPassword,setConfirmPassword]=useState('');const[name,setName]=useState('');const[consent,setConsent]=useState(false);const[error,setError]=useState('');const[message,setMessage]=useState('');const[busy,setBusy]=useState(false)
 
-  useEffect(()=>{if(promptLogin&&user&&!cleared.current){cleared.current=true;void supabase.auth.signOut({scope:'local'})}},[promptLogin,user])
+  useEffect(()=>{if(!promptLogin||cleared.current)return;cleared.current=true;void supabase.auth.getSession().then(({data})=>{if(data.session)void supabase.auth.signOut({scope:'local'})})},[promptLogin])
 
   if(user&&!promptLogin&&mode!=='reset-password')return <Navigate to="/dashboard" replace/>
-  if(user&&promptLogin)return <main className="authPage"><section className="authBrand"><RadrLogo inverse/><div className="authBrandMessage"><h1>One moment.</h1><p>Preparing a fresh sign-in for this browser.</p></div></section><section className="authFormPane"><p>Signing out of the current session…</p></section></main>
+  if(user&&promptLogin&&!cleared.current)return <main className="authPage"><section className="authBrand"><RadrLogo inverse/><div className="authBrandMessage"><h1>One moment.</h1><p>Preparing a fresh sign-in for this browser.</p></div></section><section className="authFormPane"><p>Signing out of the current session…</p></section></main>
 
   async function submit(e:FormEvent){
     e.preventDefault();setError('');setMessage('')
