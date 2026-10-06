@@ -220,8 +220,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--rose);box-shadow:0 0 
 
 @media(max-width:1050px){
   .radrHero{grid-template-columns:1fr;gap:50px}
-  .heroPhoto{max-width:700px;min-height:430px}
-  .heroPhoto img{min-height:430px}
+  .heroPhoto{max-width:540px;height:430px;justify-self:start}
   .dashboardGrid{grid-template-columns:1fr}
   .dashboardStats{grid-template-columns:1fr 1fr}
   .statBlock:nth-child(2){border-right:0}
@@ -252,6 +251,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--rose);box-shadow:0 0 
   .landingActions{gap:12px}
   .landingActions .btn{padding:8px 10px}
   .radrHero{padding:58px 18px 70px}
+  .heroPhoto{height:360px}
   .heroCopyBlock h1{font-size:clamp(2.9rem,14vw,4.3rem)}
   .productFlow{padding:0 18px 72px}
   .landingClose{margin:0 18px 50px}
