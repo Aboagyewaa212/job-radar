@@ -94,6 +94,9 @@ p{line-height:1.6}
 .authMode button{border:0;border-bottom:3px solid transparent;background:transparent;padding:0 0 12px;color:#111;font-weight:600}
 .authMode button.active{border-color:var(--rose)}
 .authSubmit{width:100%;margin-top:5px}
+.forgotLink,.textButton{border:0;background:transparent;color:#111;padding:0;text-align:left;font-size:.86rem;text-decoration:underline;text-underline-offset:4px;justify-self:start}
+.forgotLink{margin-top:-4px}
+.textButton{margin-top:2px}
 .consentRow,.check,.inlineControl{display:flex;align-items:flex-start;gap:9px}
 .consentRow input,.check input,.inlineControl input{width:auto;margin-top:3px}
 
@@ -217,7 +220,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--rose);box-shadow:0 0 
 
 @media(max-width:1050px){
   .radrHero{grid-template-columns:1fr;gap:50px}
-  .radarDemo{max-width:700px}
+  .heroPhoto{max-width:700px;min-height:430px}
+  .heroPhoto img{min-height:430px}
   .dashboardGrid{grid-template-columns:1fr}
   .dashboardStats{grid-template-columns:1fr 1fr}
   .statBlock:nth-child(2){border-right:0}
