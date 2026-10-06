@@ -25,7 +25,13 @@ export function useRadar(){
     ])
     let count=0
     if(jobsResult.error)setError(jobsResult.error.message)
-    else{const next=(jobsResult.data??[]) as unknown as RadarJob[];setJobs(next);count=next.length}
+    else{const next=((jobsResult.data??[]) as unknown as RadarJob[]).sort((a,b)=>{
+      const fitDiff=(b.user_job_matches?.[0]?.fit_score??0)-(a.user_job_matches?.[0]?.fit_score??0)
+      if(fitDiff!==0)return fitDiff
+      const aPosted=a.posted_at?new Date(a.posted_at).getTime():0
+      const bPosted=b.posted_at?new Date(b.posted_at).getTime():0
+      return bPosted-aPosted
+    });setJobs(next);count=next.length}
     if(!countResult.error)setAppliedToday(countResult.count??0)
     if(!preferencesResult.error)setDailyGoal(Math.min(5,Math.max(1,preferencesResult.data.daily_application_goal??5)))
     setLoading(false)
