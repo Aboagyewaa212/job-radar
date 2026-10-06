@@ -1,10 +1,38 @@
-import { NavLink, Outlet } from 'react-router-dom'
-import { Bookmark, BriefcaseBusiness, FileText, LogOut, Radar, Settings, UserRound } from 'lucide-react'
-import { useAuth } from '../hooks/useAuth'
+import {useState} from 'react'
+import {NavLink,Outlet} from 'react-router-dom'
+import {useAuth} from '../hooks/useAuth'
+import {RadrLogo} from '../components/RadrLogo'
+
+const topNav=[
+  ['/dashboard','Dashboard'],
+  ['/radar','RADR'],
+  ['/saved','Saved'],
+  ['/applications','Applications'],
+  ['/resume','Resume Studio'],
+  ['/preferences','Preferences'],
+] as const
 
 export function DashboardLayout(){
-  const {user,signOut}=useAuth(); const name=(user?.user_metadata?.display_name as string)||user?.email?.split('@')[0]||'Job seeker'
-  return <div className="appShell"><aside className="sidebar"><div className="brand productWordmark"><div><b>Job Radar</b><small>SEARCH WORKSPACE</small></div></div><nav>
-    <NavLink to="/radar"><Radar size={17}/>Radar</NavLink><NavLink to="/saved"><Bookmark size={17}/>Saved</NavLink><NavLink to="/applications"><BriefcaseBusiness size={17}/>Applications</NavLink><NavLink to="/resume"><FileText size={17}/>Resume Studio</NavLink><NavLink to="/preferences"><Settings size={17}/>Preferences</NavLink><NavLink to="/profile"><UserRound size={17}/>Profile</NavLink>
-  </nav><div className="sidebarFoot"><div className="avatar">{name.slice(0,2).toUpperCase()}</div><div className="userMeta"><b>{name}</b><small>{user?.email}</small></div><button className="iconButton" onClick={()=>void signOut()} aria-label="Sign out"><LogOut size={16}/></button></div></aside><main className="main"><Outlet/></main></div>
+  const{signOut}=useAuth()
+  const[confirming,setConfirming]=useState(false)
+  async function logout(){setConfirming(false);await signOut()}
+  return <div className="appShell">
+    <aside className="sidebar">
+      <NavLink to="/dashboard" className="sidebarBrand" aria-label="RADR dashboard"><RadrLogo inverse/></NavLink>
+      <nav className="sidebarNav" aria-label="Workspace">{topNav.map(([to,label])=><NavLink key={to} to={to}>{label}</NavLink>)}</nav>
+      <nav className="sidebarUtility" aria-label="Account">
+        <NavLink to="/profile">Profile</NavLink>
+        <NavLink to="/settings">Settings</NavLink>
+        <button type="button" onClick={()=>setConfirming(true)}>Logout</button>
+      </nav>
+    </aside>
+    <main className="main"><Outlet/></main>
+    {confirming&&<div className="modalBackdrop" role="presentation" onMouseDown={e=>{if(e.currentTarget===e.target)setConfirming(false)}}>
+      <section className="logoutDialog" role="dialog" aria-modal="true" aria-labelledby="logout-title">
+        <h2 id="logout-title">Sign out?</h2>
+        <p>Your saved jobs, applications and documents will stay in your account.</p>
+        <div className="dialogActions"><button className="btn secondary" type="button" onClick={()=>setConfirming(false)}>Cancel</button><button className="btn primary" type="button" onClick={()=>void logout()}>Sign out</button></div>
+      </section>
+    </div>}
+  </div>
 }

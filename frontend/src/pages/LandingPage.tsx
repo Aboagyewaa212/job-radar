@@ -1,18 +1,38 @@
-import { ArrowRight } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import {useState} from 'react'
+import {Link} from 'react-router-dom'
+import {RadrLogo} from '../components/RadrLogo'
 
-const steps=[
-  ['01','Set the direction','Choose the roles, location and working style you want. Your preferences guide the search without limiting it to exact phrases.'],
-  ['02','Add your CV','We read the experience, tools, skills and role language already present in your CV and use them as additional search and matching signals.'],
-  ['03','Work from a shortlist','Review a smaller set of sourced roles, understand the match, save the useful ones and prepare an application.'],
+const preview=[
+  {title:'Project Coordinator',company:'Northstar',fit:94,reason:'Project coordination · Notion · stakeholder communication'},
+  {title:'Community Manager',company:'Common Ground',fit:91,reason:'Community management · content · events'},
+  {title:'Operations Associate',company:'Studio North',fit:89,reason:'Google Workspace · documentation · coordination'},
 ]
 
-export default function LandingPage(){return <div className="landingPage editorialLanding">
-  <a className="skipLink" href="#main">Skip to main content</a>
-  <header className="landingNav"><Link to="/" className="wordmark">Job Radar</Link><nav aria-label="Primary"><a href="#method">Method</a><Link to="/privacy">Privacy</Link></nav><div className="landingActions"><Link className="textAction" to="/auth?mode=login&prompt=1">Sign in</Link><Link className="btn primary" to="/auth?mode=signup">Create account</Link></div></header>
-  <main id="main"><section className="heroSection editorialHero"><div className="heroIndex">01 / CAREER SEARCH</div><h1>Less searching.<br/>Better reasons to apply.</h1><div className="heroLower"><p className="heroCopy">A focused job-search workspace that uses your CV, preferences and trusted job sources to narrow the market into roles worth your time.</p><Link className="heroLink" to="/auth?mode=signup">Start your search <ArrowRight size={17}/></Link></div></section>
-  <section className="proofStrip" aria-label="Product principles"><span>CV-informed matching</span><span>Direct application sources</span><span>Private resume storage</span><span>No fabricated credentials</span></section>
-  <section id="method" className="landingSection methodSection"><div className="sectionIntro"><p className="sectionNumber">02</p><h2>A search process,<br/>not another job board.</h2></div><div className="methodList">{steps.map(([n,title,body])=><article className="methodRow" key={n}><span>{n}</span><h3>{title}</h3><p>{body}</p></article>)}</div></section>
-  <section className="closingSection"><p>Built for deliberate applications.</p><h2>Keep the search broad.<br/>Keep the shortlist useful.</h2><Link className="heroLink" to="/auth?mode=signup">Create your radar <ArrowRight size={17}/></Link></section></main>
-  <footer className="publicFooter"><div><b>Job Radar</b><p>Independent career-search software project.</p></div><nav aria-label="Legal"><Link to="/privacy">Privacy</Link><Link to="/terms">Terms</Link><Link to="/cookies">Cookies</Link><Link to="/accessibility">Accessibility</Link></nav></footer>
-</div>}
+export default function LandingPage(){
+  const[selected,setSelected]=useState(0)
+  const job=preview[selected]
+  return <div className="landingPage">
+    <a className="skipLink" href="#main">Skip to main content</a>
+    <header className="landingNav">
+      <Link to="/" aria-label="RADR home"><RadrLogo/></Link>
+      <div className="landingActions"><Link className="textAction" to="/auth?mode=login&prompt=1">Sign in</Link><Link className="btn primary" to="/auth?mode=signup">Create account</Link></div>
+    </header>
+    <main id="main">
+      <section className="radrHero">
+        <div className="heroCopyBlock"><h1>Find the work worth your attention.</h1><p>RADR reads the signals already in your CV, combines them with what you want next, and turns a noisy job market into a shortlist you can act on.</p><Link className="btn primary heroCta" to="/auth?mode=signup">Start your RADR</Link></div>
+        <div className="radarDemo" aria-label="Interactive RADR preview">
+          <div className="radarDemoTop"><RadrLogo compact/><span>Today</span></div>
+          <div className="demoList">{preview.map((item,index)=><button type="button" className={index===selected?'selected':''} key={item.title} onClick={()=>setSelected(index)}><span><b>{item.title}</b><small>{item.company}</small></span><strong>{item.fit}%</strong></button>)}</div>
+          <div className="demoReason"><b>Why it surfaced</b><p>{job.reason}</p></div>
+        </div>
+      </section>
+      <section className="productFlow">
+        <article><span>1</span><h2>Add your CV</h2><p>Your experience becomes part of the search rather than a file you only use at the end.</p></article>
+        <article><span>2</span><h2>Set your direction</h2><p>Tell RADR what kind of work, location and setup you want more of.</p></article>
+        <article><span>3</span><h2>Work the shortlist</h2><p>Save roles, track applications, tailor your CV and draft a cover letter for each job.</p></article>
+      </section>
+      <section className="landingClose"><RadrLogo inverse/><h2>Less scrolling. More deliberate applications.</h2><Link className="btn light" to="/auth?mode=signup">Create account</Link></section>
+    </main>
+    <footer className="publicFooter"><span>RADR</span><nav aria-label="Legal"><Link to="/privacy">Privacy</Link><Link to="/terms">Terms</Link><Link to="/accessibility">Accessibility</Link></nav></footer>
+  </div>
+}
