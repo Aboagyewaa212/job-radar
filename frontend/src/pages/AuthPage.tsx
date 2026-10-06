@@ -15,11 +15,24 @@ export default function AuthPage(){
   const promptLogin=params.get('prompt')==='1',cleared=useRef(false)
   const[mode,setMode]=useState<Mode>(initial)
   const[email,setEmail]=useState('');const[password,setPassword]=useState('');const[confirmPassword,setConfirmPassword]=useState('');const[name,setName]=useState('');const[consent,setConsent]=useState(false);const[error,setError]=useState('');const[message,setMessage]=useState('');const[busy,setBusy]=useState(false)
+  const[recoveryReady,setRecoveryReady]=useState<boolean|null>(initial==='reset-password'?null:true)
 
-  useEffect(()=>{if(promptLogin&&user&&!cleared.current){cleared.current=true;void supabase.auth.signOut({scope:'local'})}},[promptLogin,user])
+  useEffect(()=>{if(!promptLogin||cleared.current)return;cleared.current=true;void supabase.auth.getSession().then(({data})=>{if(data.session)void supabase.auth.signOut({scope:'local'})})},[promptLogin])
+
+  useEffect(()=>{
+    if(mode!=='reset-password'){setRecoveryReady(true);return}
+    let active=true
+    void supabase.auth.getSession().then(({data})=>{if(active)setRecoveryReady(Boolean(data.session))})
+    const{data:{subscription}}=supabase.auth.onAuthStateChange((event,session)=>{
+      if(!active)return
+      if(event==='PASSWORD_RECOVERY'||session)setRecoveryReady(true)
+      if(event==='SIGNED_OUT')setRecoveryReady(false)
+    })
+    return()=>{active=false;subscription.unsubscribe()}
+  },[mode])
 
   if(user&&!promptLogin&&mode!=='reset-password')return <Navigate to="/dashboard" replace/>
-  if(user&&promptLogin)return <main className="authPage"><section className="authBrand"><RadrLogo inverse/><div className="authBrandMessage"><h1>One moment.</h1><p>Preparing a fresh sign-in for this browser.</p></div></section><section className="authFormPane"><p>Signing out of the current session…</p></section></main>
+  if(user&&promptLogin&&!cleared.current)return <main className="authPage"><section className="authBrand"><RadrLogo inverse/><div className="authBrandMessage"><h1>One moment.</h1><p>Preparing a fresh sign-in for this browser.</p></div></section><section className="authFormPane"><p>Signing out of the current session…</p></section></main>
 
   async function submit(e:FormEvent){
     e.preventDefault();setError('');setMessage('')
@@ -36,6 +49,8 @@ export default function AuthPage(){
       if(!strongPassword(password)){setError('Use at least 8 characters with uppercase, lowercase, a number, and a symbol.');return}
       if(password!==confirmPassword){setError('Passwords do not match.');return}
       setBusy(true)
+      const{data:{session}}=await supabase.auth.getSession()
+      if(!session){setBusy(false);setRecoveryReady(false);setError('This reset link is no longer active. Request a new password reset email.');return}
       const{error}=await supabase.auth.updateUser({password})
       setBusy(false)
       if(error){setError(error.message);return}
@@ -70,13 +85,15 @@ export default function AuthPage(){
       <form onSubmit={submit} className="stack">
         {mode==='signup'&&<label>Name<input autoComplete="name" value={name} onChange={e=>setName(e.target.value)} required/></label>}
         {mode!=='reset-password'&&<label>Email<input type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} required/></label>}
-        {(mode==='signup'||mode==='login'||mode==='reset-password')&&<label>Password<input type="password" autoComplete={mode==='login'?'current-password':'new-password'} value={password} onChange={e=>setPassword(e.target.value)} minLength={mode==='login'?1:8} required/>{mode!=='login'&&<small className="finePrint">At least 8 characters with uppercase, lowercase, a number, and a symbol.</small>}</label>}
-        {mode==='reset-password'&&<label>Confirm password<input type="password" autoComplete="new-password" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} minLength={8} required/></label>}
+        {mode==='reset-password'&&recoveryReady===null&&<p className="status" role="status">Verifying your reset link…</p>}
+        {mode==='reset-password'&&recoveryReady===false&&<div className="stack"><p className="error" role="alert">This reset link is no longer active. It may have expired, been used already, or the recovery session was cleared.</p><button className="btn secondary" type="button" onClick={()=>{setMode('forgot');setError('');setMessage('');setPassword('');setConfirmPassword('')}}>Request a new reset link</button></div>}
+        {(mode==='signup'||mode==='login'||(mode==='reset-password'&&recoveryReady===true))&&<label>Password<input type="password" autoComplete={mode==='login'?'current-password':'new-password'} value={password} onChange={e=>setPassword(e.target.value)} minLength={mode==='login'?1:8} required/>{mode!=='login'&&<small className="finePrint">At least 8 characters with uppercase, lowercase, a number, and a symbol.</small>}</label>}
+        {mode==='reset-password'&&recoveryReady===true&&<label>Confirm password<input type="password" autoComplete="new-password" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} minLength={8} required/></label>}
         {mode==='signup'&&<label className="consentRow"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} required/><span>I agree to the <Link to="/terms">Terms</Link> and <Link to="/privacy">Privacy Policy</Link>.</span></label>}
         {mode==='login'&&<button className="forgotLink" type="button" onClick={()=>{setMode('forgot');setError('');setMessage('')}}>Forgot password?</button>}
-        {error&&<p className="error" role="alert">{error}</p>}
+        {error&&(mode!=='reset-password'||recoveryReady===true)&&<p className="error" role="alert">{error}</p>}
         {message&&<p className="status" role="status">{message}</p>}
-        <button className="btn primary authSubmit" disabled={busy}>{busy?'Working…':mode==='signup'?'Create account':mode==='login'?'Sign in':mode==='forgot'?'Send reset link':'Update password'}</button>
+        {(mode!=='reset-password'||recoveryReady===true)&&<button className="btn primary authSubmit" disabled={busy||recoveryReady===null}>{busy?'Working…':mode==='signup'?'Create account':mode==='login'?'Sign in':mode==='forgot'?'Send reset link':'Update password'}</button>}
         {mode==='forgot'&&<button className="textButton" type="button" onClick={()=>setMode('login')}>Back to sign in</button>}
         {mode==='reset-password'&&message&&<button className="textButton" type="button" onClick={()=>nav('/dashboard')}>Continue to dashboard</button>}
       </form>
