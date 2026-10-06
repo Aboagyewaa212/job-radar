@@ -6,8 +6,9 @@ import LandingPage from '../pages/LandingPage'
 describe('LandingPage',()=>{
   it('shows the public value proposition and auth entry points',()=>{
     render(<MemoryRouter><LandingPage/></MemoryRouter>)
-    expect(screen.getByRole('heading',{name:/Find work that fits your evidence/i})).toBeInTheDocument()
+    expect(screen.getByRole('heading',{name:/Less searching. Better reasons to apply/i})).toBeInTheDocument()
+    expect(screen.getByText(/CV-informed matching/i)).toBeInTheDocument()
     expect(screen.getByRole('link',{name:/Create account/i})).toHaveAttribute('href','/auth?mode=signup')
-    expect(screen.getByRole('link',{name:/Sign in/i})).toHaveAttribute('href','/auth?mode=login')
+    expect(screen.getByRole('link',{name:/Sign in/i})).toHaveAttribute('href','/auth?mode=login&prompt=1')
   })
 })
