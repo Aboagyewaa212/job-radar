@@ -185,6 +185,44 @@ p{line-height:1.6}
 .miniCard{padding:14px;margin:0 6px 8px;display:grid;gap:5px}
 .miniCard span,.miniCard small{color:#111;opacity:.65}
 
+
+.radarStats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));background:var(--surface);border:1px solid var(--line);margin-bottom:18px}
+.radarStat{display:grid;gap:4px;padding:18px 20px;border-right:1px solid var(--line)}
+.radarStat:last-child{border-right:0}
+.radarStat strong{font-size:1.55rem;line-height:1}
+.radarStat span{font-size:.78rem;opacity:.68}
+.radarFilterRow{display:grid;grid-template-columns:minmax(260px,1.5fr) repeat(3,minmax(145px,.6fr)) auto;gap:10px;align-items:center;margin:18px 0}
+.radarFilterRow select{height:42px;background:var(--surface)}
+.radarSearch{height:42px;display:flex;align-items:center;gap:8px;padding:0 12px;background:var(--surface);border:1px solid #111;font-weight:400}
+.radarSearch input{border:0;box-shadow:none!important;padding:0;background:transparent}
+.radarReset{white-space:nowrap}
+.radarTable{background:var(--surface);border:1px solid var(--line);overflow-x:auto}
+.radarTableHead,.radarTableRow{min-width:1040px;display:grid;grid-template-columns:minmax(280px,1.55fr) minmax(125px,.65fr) 90px minmax(145px,.8fr) minmax(135px,.75fr) 110px 150px;align-items:center}
+.radarTableHead{min-height:46px;border-bottom:1px solid var(--line);background:var(--paper);font-size:.74rem;font-weight:700}
+.radarTableHead span{padding:0 14px}
+.radarTableRow{min-height:78px;border-bottom:1px solid var(--line)}
+.radarTableRow:last-of-type{border-bottom:0}
+.radarTableRow>div{padding:12px 14px;min-width:0}
+.radarJobCell{display:flex;align-items:center;gap:8px}
+.radarJobCell>div{display:grid;gap:4px;min-width:0}
+.radarJobCell strong,.radarJobCell span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.radarJobCell strong{font-size:.9rem}
+.radarJobCell span,.radarSourceCell small{font-size:.75rem;opacity:.65}
+.radarSourceCell{display:grid;gap:3px}
+.radarSourceCell a{text-decoration:underline;text-underline-offset:3px}
+.radarFitCell{display:grid;gap:1px}
+.radarFitCell strong{font-size:1.1rem}
+.radarFitCell span{font-size:.7rem;opacity:.6}
+.radarLocationCell{display:flex;align-items:center;gap:6px;font-size:.8rem}
+.radarDeadlineCell,.radarStatusCell{font-size:.78rem}
+.radarStatusCell{text-transform:capitalize}
+.radarActionCell{display:flex;align-items:center;justify-content:flex-end;gap:4px}
+.radarActionCell .btn{min-height:36px;padding:7px 10px;font-size:.76rem}
+.radarExpanded{min-width:1040px;padding:18px 22px 20px;border-bottom:1px solid var(--line);background:var(--paper);display:grid;grid-template-columns:1.5fr .8fr 1fr auto;gap:22px}
+.radarExpanded h3{font-size:.82rem;margin-bottom:7px}
+.radarExpanded p{font-size:.8rem;line-height:1.5;margin:0;max-height:96px;overflow:auto}
+.radarExpandedActions{display:flex;align-items:flex-end;justify-content:flex-end;gap:8px}
+
 /* forms, preferences, profile, studio */
 .settingsGrid,.twoCol{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 label{font-weight:650;font-size:.86rem;display:grid;gap:7px}
@@ -220,6 +258,11 @@ input:focus,textarea:focus,select:focus{border-color:var(--rose);box-shadow:0 0 
 .cookieActions>a{text-decoration:underline}
 
 @media(max-width:1050px){
+  .radarStats{grid-template-columns:repeat(3,1fr)}
+  .radarStat:nth-child(3){border-right:0}
+  .radarStat:nth-child(-n+3){border-bottom:1px solid var(--line)}
+  .radarFilterRow{grid-template-columns:1fr 1fr}
+  .radarSearch{grid-column:1/-1}
   .radrHero{grid-template-columns:1fr;gap:50px}
   .heroPhoto{max-width:540px;height:430px;justify-self:start}
   .dashboardGrid{grid-template-columns:1fr}
@@ -249,6 +292,12 @@ input:focus,textarea:focus,select:focus{border-color:var(--rose);box-shadow:0 0 
   .kanban{grid-template-columns:repeat(2,minmax(220px,1fr))}
 }
 @media(max-width:560px){
+  .radarStats{grid-template-columns:1fr 1fr}
+  .radarStat:nth-child(odd){border-right:1px solid var(--line)}
+  .radarStat:nth-child(even){border-right:0}
+  .radarStat:nth-child(-n+4){border-bottom:1px solid var(--line)}
+  .radarFilterRow{grid-template-columns:1fr}
+  .radarSearch{grid-column:auto}
   .landingNav{height:74px;padding:0 18px}
   .landingNav .radrWord{font-size:1.25rem}
   .landingActions{gap:12px}
