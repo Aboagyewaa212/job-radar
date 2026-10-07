@@ -1,6 +1,6 @@
 import {useMemo,useState} from 'react'
 import {NavLink,Outlet} from 'react-router-dom'
-import {Bookmark,BriefcaseBusiness,FileText,LayoutDashboard,LogOut,Radar,Settings,SlidersHorizontal,UserRound} from 'lucide-react'
+import {Bookmark,BriefcaseBusiness,FileText,LayoutDashboard,LogOut,Radar,Settings,SlidersHorizontal} from 'lucide-react'
 import {useAuth} from '../hooks/useAuth'
 import {RadrLogo} from '../components/RadrLogo'
 
@@ -13,18 +13,11 @@ const topNav=[
   {to:'/preferences',label:'Preferences',icon:SlidersHorizontal},
 ] as const
 
-const utilityNav=[
-  {to:'/profile',label:'Profile',icon:UserRound},
-  {to:'/settings',label:'Settings',icon:Settings},
-] as const
-
 export function DashboardLayout(){
   const{user,signOut}=useAuth()
   const[confirming,setConfirming]=useState(false)
-  const initials=useMemo(()=>{
-    const source=String(user?.user_metadata?.display_name||user?.email?.split('@')[0]||'R')
-    return source.split(/\s+/).slice(0,2).map((part:string)=>part[0]?.toUpperCase()).join('')
-  },[user])
+  const displayName=String(user?.user_metadata?.display_name||user?.email?.split('@')[0]||'Your account')
+  const initials=useMemo(()=>displayName.split(/\s+/).slice(0,2).map((part:string)=>part[0]?.toUpperCase()).join(''),[displayName])
 
   async function logout(){setConfirming(false);await signOut()}
 
@@ -39,12 +32,13 @@ export function DashboardLayout(){
       </div>
 
       <div className="sidebarBottom">
-        <div className="sidebarAccount">
+        <NavLink to="/profile" className="sidebarUser" aria-label="Open profile">
           <span className="sidebarAvatar">{initials}</span>
-          <div><b>{user?.user_metadata?.display_name||'Your account'}</b><span>{user?.email||''}</span></div>
-        </div>
+          <div><b>{displayName}</b><span>View profile</span></div>
+        </NavLink>
+
         <nav className="sidebarUtility" aria-label="Account">
-          {utilityNav.map(({to,label,icon:Icon})=><NavLink key={to} to={to} title={label}><Icon size={17}/><span>{label}</span></NavLink>)}
+          <NavLink to="/settings" title="Settings"><Settings size={17}/><span>Settings</span></NavLink>
           <button type="button" onClick={()=>setConfirming(true)}><LogOut size={17}/><span>Sign out</span></button>
         </nav>
       </div>
