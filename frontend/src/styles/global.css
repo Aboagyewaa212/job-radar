@@ -126,7 +126,7 @@ label small{font-weight:400}
 .check input,.inlineControl input,.consentRow input{margin-top:2px;flex:0 0 auto}
 
 /* Logo */
-.radrLogo{display:inline-flex;align-items:center;gap:8px;color:var(--logo-text);font-weight:800}
+.radrLogo{--logo-text:var(--ink);display:inline-flex;align-items:center;gap:8px;color:var(--logo-text);font-weight:800}
 .radrLogo.compact{gap:0}
 .radrWord{font-size:1.42rem;line-height:1;letter-spacing:-.07em;color:var(--logo-text)}
 .radrMark{display:block;flex:none}
