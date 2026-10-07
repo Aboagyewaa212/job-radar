@@ -1,4 +1,4 @@
-export type ApplicationStage = 'discovered'|'saved'|'applying'|'applied'|'interview'|'rejected'|'offer'|'withdrawn'
+export type ApplicationStage = 'discovered'|'saved'|'applying'|'applied'|'assessment'|'interview'|'rejected'|'offer'|'withdrawn'
 
 export type RadarJob = {
   id: string
@@ -22,5 +22,12 @@ export type RadarJob = {
   source_count: number
   job_sources?: { name: string } | null
   user_job_matches?: Array<{ fit_score:number; why_match:string[]; missing_skills:string[] }>
-  application_progress?: Array<{ saved:boolean; stage:ApplicationStage; applied_at:string|null; notes:string|null }>
+  application_progress?: Array<{
+    saved:boolean
+    stage:ApplicationStage
+    applied_at:string|null
+    notes:string|null
+    next_step_label:string|null
+    next_step_at:string|null
+  }>
 }
