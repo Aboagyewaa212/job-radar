@@ -16,9 +16,30 @@ Deno.serve(async(req:Request)=>{
   const[profileResult,preferencesResult,resumeResult]=await Promise.all([userClient.from('profiles').select('*').eq('user_id',user.id).single(),userClient.from('preferences').select('*').eq('user_id',user.id).single(),userClient.from('user_resumes').select('extracted_text').eq('user_id',user.id).eq('is_primary',true).maybeSingle()]);if(profileResult.error)return json({error:profileResult.error.message},500);if(preferencesResult.error)return json({error:preferencesResult.error.message},500)
   const profile=profileResult.data,preferences=preferencesResult.data,resumeText=(resumeResult.data?.extracted_text??'').toLowerCase(),cvKeywords=resumeKeywords(resumeText),evidence=new Set([...normalize(profile?.skills),...normalize(preferences?.target_roles),...normalize(profile?.target_fields),...cvKeywords]);for(const tokenPart of words(resumeText))evidence.add(tokenPart)
   const{data:jobs,error:jobsError}=await admin.from('jobs').select('id,title,company,location,remote_scope,fully_remote,description,requirements,skills,status,posted_at,job_sources(name)').eq('status','active').order('posted_at',{ascending:false,nullsFirst:false}).limit(1500);if(jobsError)return json({error:jobsError.message},500)
-  const excluded=normalize(preferences?.excluded_keywords),targetRoles=normalize(preferences?.target_roles),targetTokens=[...new Set(targetRoles.flatMap(words))],cvRoleTokens=[...new Set(cvKeywords.filter(token=>token.length>=4))]
-  const candidates=(jobs??[]).map((job:any)=>{const jobSkills=normalize(job.skills),title=String(job.title??'').toLowerCase(),text=`${job.title??''} ${job.company??''} ${job.description??''} ${JSON.stringify(job.requirements??[])}`.toLowerCase();if(excluded.some(keyword=>keyword&&text.includes(keyword)))return null;if(preferences?.remote_only&&!job.fully_remote)return null;const matched=[...evidence].filter(skill=>skill.length>2&&(jobSkills.includes(skill)||text.includes(skill))).slice(0,16),missing=jobSkills.filter((skill:string)=>!evidence.has(skill)&&!resumeText.includes(skill)).slice(0,8),skillScore=jobSkills.length?Math.round((matched.length/Math.max(jobSkills.length,1))*60):Math.min(matched.length*7,45),remoteBonus=preferences?.remote_only?15:(job.fully_remote?5:0),exactRole=targetRoles.some(role=>title.includes(role)),tokenHits=targetTokens.filter(token=>title.includes(token)).length,cvTitleHits=cvRoleTokens.filter(token=>title.includes(token)).length,cvKeywordHits=cvKeywords.filter(token=>text.includes(token)).length,roleBonus=exactRole?25:Math.min(tokenHits*8+cvTitleHits*4,20),cvBonus=Math.min(cvKeywordHits,10),recencyBonus=job.posted_at&&Date.now()-new Date(job.posted_at).getTime()<14*86400000?5:0,fit=Math.max(0,Math.min(100,skillScore+remoteBonus+roleBonus+cvBonus+recencyBonus));return{user_id:user.id,job_id:job.id,fit_score:fit,why_match:matched.slice(0,5),missing_skills:missing,matched_at:new Date().toISOString()}}).filter(Boolean) as Array<{user_id:string;job_id:string;fit_score:number;why_match:string[];missing_skills:string[];matched_at:string}>
-  const minimum=Number(preferences?.minimum_fit_score??60);let rows=candidates.filter(row=>row.fit_score>=minimum),fallback=false;if(!rows.length&&candidates.length){rows=[...candidates].sort((a,b)=>b.fit_score-a.fit_score).slice(0,25);fallback=true}
+  const excluded=normalize(preferences?.excluded_keywords),targetRoles=normalize(preferences?.target_roles),targetTokens=[...new Set(targetRoles.flatMap(words))]
+  const profileSkills=normalize(profile?.skills),profileFields=normalize(profile?.target_fields)
+  const evidenceTerms=[...new Set([...profileSkills,...profileFields,...cvKeywords])].filter(term=>term.length>=3).slice(0,120)
+  const candidates=(jobs??[]).map((job:any)=>{
+    const jobSkills=normalize(job.skills),title=String(job.title??'').toLowerCase(),text=`${job.title??''} ${job.company??''} ${job.description??''} ${JSON.stringify(job.requirements??[])}`.toLowerCase()
+    if(excluded.some(keyword=>keyword&&text.includes(keyword)))return null
+    if(preferences?.remote_only&&!job.fully_remote)return null
+    const matchedTerms=evidenceTerms.filter(term=>text.includes(term))
+    const matchedSkills=jobSkills.filter((skill:string)=>evidence.has(skill)||resumeText.includes(skill))
+    const missing=jobSkills.filter((skill:string)=>!evidence.has(skill)&&!resumeText.includes(skill)).slice(0,8)
+    const exactRole=targetRoles.some(role=>role&&title.includes(role))
+    const titleTokenHits=targetTokens.filter(token=>title.includes(token)).length
+    const roleCoverage=targetTokens.length?titleTokenHits/targetTokens.length:0
+    const roleScore=exactRole?40:Math.round(Math.min(1,roleCoverage)*35)
+    const skillScore=jobSkills.length?Math.round((matchedSkills.length/Math.max(jobSkills.length,1))*35):Math.round(Math.min(1,matchedTerms.length/10)*25)
+    const evidenceScore=Math.min(15,matchedTerms.length*2)
+    const recencyScore=job.posted_at&&Date.now()-new Date(job.posted_at).getTime()<14*86400000?5:0
+    const remoteScore=job.fully_remote?5:0
+    const fit=Math.max(0,Math.min(100,roleScore+skillScore+evidenceScore+recencyScore+remoteScore))
+    const why=[...new Set([...matchedSkills,...matchedTerms])].slice(0,5)
+    return{user_id:user.id,job_id:job.id,fit_score:fit,why_match:why,missing_skills:missing,matched_at:new Date().toISOString()}
+  }).filter(Boolean) as Array<{user_id:string;job_id:string;fit_score:number;why_match:string[];missing_skills:string[];matched_at:string}>
+  const minimum=Math.max(0,Math.min(100,Number(preferences?.minimum_fit_score??60)))
+  const rows=candidates.filter(row=>row.fit_score>=minimum)
   const{error:usageError}=await admin.from('function_usage').insert({user_id:user.id,action:'match_jobs'});if(usageError)return json({error:'Could not record match usage'},500)
-  const{error:clearError}=await admin.from('user_job_matches').delete().eq('user_id',user.id);if(clearError)return json({error:clearError.message},500);if(rows.length){const{error}=await admin.from('user_job_matches').insert(rows);if(error)return json({error:error.message},500)}const strongest=[...rows].sort((a,b)=>b.fit_score-a.fit_score).slice(0,10);return json({matched:rows.length,strongest,fallback,requestedMinimum:minimum})
+  const{error:clearError}=await admin.from('user_job_matches').delete().eq('user_id',user.id);if(clearError)return json({error:clearError.message},500);if(rows.length){const{error}=await admin.from('user_job_matches').insert(rows);if(error)return json({error:error.message},500)}const strongest=[...rows].sort((a,b)=>b.fit_score-a.fit_score).slice(0,10);return json({matched:rows.length,strongest,requestedMinimum:minimum})
 })
