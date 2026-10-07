@@ -124,12 +124,14 @@ export default function SettingsPage(){
       <section className="settingsSection">
         <div className="settingsSectionTitle"><Eye size={18}/><h2>Appearance & accessibility</h2></div>
         <div className="settingsList">
-          <div className="settingsItem">
+          <label className="settingsItem settingsSelectRow">
             <div><b>Theme</b><span>Choose how Job RADR looks.</span></div>
-            <div className="themeControl" role="group" aria-label="Theme">
-              {(['light','dark','system'] as Theme[]).map(option=><button key={option} type="button" className={theme===option?'active':''} onClick={()=>setTheme(option)}>{option[0].toUpperCase()+option.slice(1)}</button>)}
-            </div>
-          </div>
+            <select className="settingsSelect" value={theme} onChange={e=>setTheme(e.target.value as Theme)} aria-label="Theme">
+              <option value="system">System</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </label>
           <label className="settingsToggle">
             <div><b>Reduce motion</b><span>Turn off interface animations and transitions.</span></div>
             <input type="checkbox" checked={reducedMotion} onChange={e=>setReducedMotion(e.target.checked)}/>
