@@ -3,6 +3,7 @@
   color:#111;
   background:#f7f1f5;
   font-synthesis:none;
+  color-scheme:light;
   --paper:#f7f1f5;
   --surface:#fffdfd;
   --ink:#111;
@@ -12,6 +13,20 @@
   --rose-soft:#ead0dd;
   --line:#d9c8d2;
   --danger:#7d1733;
+}
+:root[data-theme="dark"]{
+  color:#f7eef4;
+  background:#160f15;
+  color-scheme:dark;
+  --paper:#160f15;
+  --surface:#211820;
+  --ink:#f7eef4;
+  --plum:#2b0e24;
+  --plum-2:#3b122f;
+  --rose:#d795b8;
+  --rose-soft:#3a2633;
+  --line:#493842;
+  --danger:#ff8aa8;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -434,3 +449,19 @@ input:focus,textarea:focus,select:focus{border-color:var(--rose);box-shadow:0 0 
   .settingsLegalGrid a{border-right:0;border-bottom:1px solid var(--line)}
   .settingsLegalGrid a:last-child{border-bottom:0}
 }
+
+.themeControl{display:flex;border:1px solid var(--line);background:var(--paper)}
+.themeControl button{border:0;border-right:1px solid var(--line);background:transparent;color:var(--ink);padding:9px 14px;min-width:76px}
+.themeControl button:last-child{border-right:0}
+.themeControl button.active{background:var(--plum);color:#fff}
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] textarea,
+:root[data-theme="dark"] select{background:#171116;color:var(--ink);border-color:var(--line)}
+:root[data-theme="dark"] .btn.secondary{color:var(--ink);border-color:var(--line)}
+:root[data-theme="dark"] .profileReadOnly,
+:root[data-theme="dark"] .assistantChoice,
+:root[data-theme="dark"] .studioDocumentEditor,
+:root[data-theme="dark"] .logoutDialog{background:var(--surface);color:var(--ink)}
+:root[data-theme="dark"] .profileDanger{background:#2a171d}
+:root[data-theme="dark"] .settingsMessage{background:#18301f}
+@media(max-width:560px){.themeControl{width:100%}.themeControl button{flex:1}}
