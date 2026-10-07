@@ -24,6 +24,17 @@ function validResumeFile(file:File){
   return file.size<=MAX_RESUME_BYTES&&ALLOWED_EXTENSIONS.some(ext=>name.endsWith(ext))
 }
 
+async function functionErrorMessage(error:unknown){
+  const candidate=error as {message?:string;context?:Response}
+  if(candidate?.context instanceof Response){
+    try{
+      const payload=await candidate.context.clone().json() as {error?:string}
+      if(payload?.error)return payload.error
+    }catch{}
+  }
+  return candidate?.message||'Could not generate the document'
+}
+
 export default function ResumePage(){
   const{user}=useAuth()
   const[resume,setResume]=useState<Resume|null>(null)
@@ -170,7 +181,7 @@ export default function ResumePage(){
       setDrafts(current=>({...current,[mode]:content}))
       setGenerationModes(current=>({...current,[mode]:String(data?.generationMode??'openai')}))
     }catch(error){
-      setError(error instanceof Error?error.message:'Could not generate the document')
+      setError(await functionErrorMessage(error))
     }finally{
       setGenerating(null)
     }
@@ -221,9 +232,7 @@ export default function ResumePage(){
   }
 
   return <>
-    <header className="pageHeader cleanHeader">
-      <div><h1>Resume Studio</h1><p className="pageHeaderNote">Your CV stays in the background while RADR helps you prepare each application.</p></div>
-    </header>
+    <header className="pageHeader cleanHeader"><h1>Resume Studio</h1></header>
 
     <div className="resumeStudioWorkspace">
       <aside className="resumeStudioSetup">
@@ -235,7 +244,7 @@ export default function ResumePage(){
 
           {resume&&<div className={hasParsedCv?'cvReady':'cvWarning'}>
             {hasParsedCv?<CheckCircle2 size={17}/>:<FileText size={17}/>}
-            <span>{hasParsedCv?'CV ready for matching and tailoring':'CV uploaded, but text could not be read'}</span>
+            <span>{hasParsedCv?'CV ready':'CV uploaded, but text could not be read'}</span>
           </div>}
 
           <input ref={fileInput} className="visuallyHidden" type="file" accept=".pdf,.docx,.txt" onChange={e=>setFile(e.target.files?.[0]??null)}/>
@@ -243,17 +252,17 @@ export default function ResumePage(){
             <Upload size={15}/>{resume?'Replace CV':'Choose CV'}
           </button>
           {file&&<div className="pendingFile"><span>{file.name}</span><button className="btn primary" type="button" disabled={uploading} onClick={()=>void replaceResume()}>{uploading?<><LoaderCircle className="spin" size={15}/>Reading CV…</>:<><Upload size={15}/>Use this CV</>}</button></div>}
-          <p className="finePrint">PDF, DOCX or TXT · up to 10 MB. RADR extracts the text privately and uses it in the background.</p>
+          <p className="finePrint">PDF, DOCX or TXT · 10 MB max.</p>
         </section>
 
         <section className="studioCard">
           <div className="studioCardHeading">
             <div className="studioStep">2</div>
-            <div><span className="studioEyebrow">Job</span><h2>Choose a RADR match</h2></div>
+            <div><span className="studioEyebrow">Job</span><h2>Choose a job</h2></div>
           </div>
 
-          {jobs.length>0?<label className="studioJobSelect">Matched job
-            <select value={selectedJobId} onChange={e=>setSelectedJobId(e.target.value)}>
+          {jobs.length>0?<label className="studioJobSelect">
+            <select aria-label="Choose a matched job" value={selectedJobId} onChange={e=>setSelectedJobId(e.target.value)}>
               {jobs.map(item=><option key={item.job_id} value={item.job_id}>{item.jobs?.title??'Job'} — {item.jobs?.company??'Company'} · {item.fit_score}%</option>)}
             </select>
           </label>:<div className="studioEmptyState">No matched jobs are available yet.</div>}
@@ -272,21 +281,21 @@ export default function ResumePage(){
       <section className="studioAssistant">
         <div className="assistantHeader">
           <div className="assistantAvatar"><Bot size={20}/></div>
-          <div><span className="studioEyebrow">RADR Assistant</span><h2>Prepare this application</h2><p>I’ll use your saved CV and the selected job. I won’t add experience you haven’t provided.</p></div>
+          <div><span className="studioEyebrow">RADR Assistant</span><h2>Prepare this application</h2></div>
         </div>
 
         <div className="assistantPrompt">
-          <label>Anything you want me to emphasize?
-            <textarea rows={3} maxLength={2000} value={instructions} onChange={e=>setInstructions(e.target.value)} placeholder="Optional — e.g. foreground coordination experience and keep the tone concise."/>
+          <label>What should RADR emphasize?
+            <textarea rows={3} maxLength={2000} value={instructions} onChange={e=>setInstructions(e.target.value)} placeholder="Optional"/>
           </label>
         </div>
 
         <div className="assistantChoiceGrid">
           <button className="assistantChoice" type="button" disabled={!selectedJobId||!hasParsedCv||Boolean(generating)} onClick={()=>void generate('resume')}>
-            <Sparkles size={18}/><span><b>Tailor my CV</b><small>Refocus your existing CV for this role.</small></span>
+            <Sparkles size={18}/><span><b>Tailor my CV</b></span>
           </button>
           <button className="assistantChoice" type="button" disabled={!selectedJobId||!hasParsedCv||Boolean(generating)} onClick={()=>void generate('cover_letter')}>
-            <Sparkles size={18}/><span><b>Draft a cover letter</b><small>Create a job-specific letter from your real experience.</small></span>
+            <Sparkles size={18}/><span><b>Draft a cover letter</b></span>
           </button>
         </div>
 
@@ -297,7 +306,7 @@ export default function ResumePage(){
 
         {!generating&&!drafts.resume&&!drafts.cover_letter&&<div className="assistantBlank">
           <Sparkles size={22}/>
-          <div><b>Your draft will appear here.</b><span>Choose a job, then ask RADR Assistant to create the document you need.</span></div>
+          <div><b>Your draft will appear here.</b></div>
         </div>}
 
         {(drafts.resume||drafts.cover_letter)&&<div className="assistantResult">
