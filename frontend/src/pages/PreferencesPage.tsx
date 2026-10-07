@@ -1,4 +1,5 @@
 import {useEffect,useState} from 'react'
+import {SlidersHorizontal,Target} from 'lucide-react'
 import {supabase} from '../services/supabase'
 import {useAuth} from '../hooks/useAuth'
 
@@ -30,8 +31,7 @@ export default function PreferencesPage(){
 
   async function save(){
     if(!user||saving)return
-    setSaving(true)
-    setStatus('')
+    setSaving(true);setStatus('')
     try{
       const strongThreshold=Math.max(minFit,threshold)
       const{error}=await supabase.from('preferences').update({
@@ -46,7 +46,6 @@ export default function PreferencesPage(){
       }).eq('user_id',user.id)
       if(error)throw error
       if(strongThreshold!==threshold)setThreshold(strongThreshold)
-
       const{data,error:matchError}=await supabase.functions.invoke('match-user-jobs',{body:{}})
       if(matchError)throw matchError
       if(typeof data?.matched!=='number')throw new Error('RADR refresh did not complete')
@@ -58,26 +57,32 @@ export default function PreferencesPage(){
   }
 
   return <>
-    <header className="pageHeader cleanHeader"><h1>Preferences</h1></header>
-    <section className="settingsGrid">
-      <div className="panel stack">
-        <h2>Search rules</h2>
-        <label>Target roles<input value={roles} onChange={e=>setRoles(e.target.value)} placeholder="Frontend Developer, Project Coordinator…"/></label>
-        <label>Preferred sources<input value={sources} onChange={e=>setSources(e.target.value)} placeholder="Leave blank for all enabled sources"/></label>
-        <p className="finePrint">Leave preferred sources blank to search every enabled source.</p>
-        <label>Exclude keywords<input value={excluded} onChange={e=>setExcluded(e.target.value)} placeholder="senior only, onsite…"/></label>
-        <label className="check"><input type="checkbox" checked={remoteOnly} onChange={e=>setRemoteOnly(e.target.checked)}/> Only show fully remote roles</label>
-      </div>
-      <div className="panel stack">
-        <h2>Fit</h2>
-        <label>Minimum match score — {minFit}%<input type="range" min="0" max="100" step="5" value={minFit} onChange={e=>{const next=+e.target.value;setMinFit(next);if(threshold<next)setThreshold(next)}}/></label>
-        <p className="finePrint">RADR will only show jobs at or above this score.</p>
-        <label>Strong-match threshold — {threshold}%<input type="range" min={minFit} max="100" step="5" value={threshold} onChange={e=>setThreshold(+e.target.value)}/></label>
-        <p className="finePrint">Email/push alerts are not enabled yet. Strong matches will still appear in your Radar.</p>
-        <div className="goalBox"><span>Daily application goal</span><strong>5</strong></div>
-      </div>
-    </section>
-    <div className="actions"><button className="btn primary" disabled={saving} onClick={()=>void save()}>{saving?<span className="buttonSpinner" aria-label="Saving"/>:'Save preferences'}</button></div>
-    {status&&<p className="status error" role="status">{status}</p>}
+    <header className="pageHeader cleanHeader"><div><span className="pageEyebrow">Matching</span><h1>Preferences</h1></div></header>
+
+    <div className="preferencesLayout">
+      <section className="preferenceCard">
+        <div className="preferenceHeading"><div className="sectionIcon"><SlidersHorizontal size={18}/></div><div><span className="sectionEyebrow">Search rules</span><h2>What should RADR look for?</h2></div></div>
+        <div className="preferenceFields">
+          <label>Target roles<input value={roles} onChange={e=>setRoles(e.target.value)} placeholder="Frontend Developer, Project Coordinator…"/></label>
+          <label>Preferred sources<input value={sources} onChange={e=>setSources(e.target.value)} placeholder="Leave blank for all enabled sources"/></label>
+          <label>Exclude keywords<input value={excluded} onChange={e=>setExcluded(e.target.value)} placeholder="Senior only, onsite…"/></label>
+          <label className="settingsToggle compactToggle"><div><b>Remote only</b><span>Only include fully remote roles.</span></div><input type="checkbox" checked={remoteOnly} onChange={e=>setRemoteOnly(e.target.checked)}/></label>
+        </div>
+      </section>
+
+      <section className="preferenceCard">
+        <div className="preferenceHeading"><div className="sectionIcon"><Target size={18}/></div><div><span className="sectionEyebrow">Fit</span><h2>Control your threshold</h2></div></div>
+        <div className="fitControls">
+          <label>Minimum match score <strong>{minFit}%</strong><input type="range" min="0" max="100" step="5" value={minFit} onChange={e=>{const next=+e.target.value;setMinFit(next);if(threshold<next)setThreshold(next)}}/></label>
+          <label>Strong match <strong>{threshold}%</strong><input type="range" min={minFit} max="100" step="5" value={threshold} onChange={e=>setThreshold(+e.target.value)}/></label>
+          <div className="thresholdPreview"><span>RADR shows</span><strong>{minFit}%+</strong><small>Strong match from {threshold}%</small></div>
+        </div>
+      </section>
+    </div>
+
+    <div className="formFooter">
+      {status&&<span className="error" role="status">{status}</span>}
+      <button className="btn primary" disabled={saving} onClick={()=>void save()}>{saving?<><span className="buttonSpinner" aria-hidden/>Saving…</>:'Save preferences'}</button>
+    </div>
   </>
 }
