@@ -17,8 +17,8 @@ Deno.serve(async(req:Request)=>{
   const profile=profileResult.data,preferences=preferencesResult.data,resumeText=(resumeResult.data?.extracted_text??'').toLowerCase(),cvKeywords=resumeKeywords(resumeText),evidence=new Set([...normalize(profile?.skills),...normalize(preferences?.target_roles),...normalize(profile?.target_fields),...cvKeywords]);for(const tokenPart of words(resumeText))evidence.add(tokenPart)
   const{data:jobs,error:jobsError}=await admin.from('jobs').select('id,title,company,location,remote_scope,fully_remote,description,requirements,skills,status,posted_at,job_sources(name)').eq('status','active').order('posted_at',{ascending:false,nullsFirst:false}).limit(1500);if(jobsError)return json({error:jobsError.message},500)
   const excluded=normalize(preferences?.excluded_keywords),targetRoles=normalize(preferences?.target_roles),targetTokens=[...new Set(targetRoles.flatMap(words))]
-  const profileSkills=normalize(profile?.skills),profileFields=normalize(profile?.target_fields)
-  const evidenceTerms=[...new Set([...profileSkills,...profileFields,...cvKeywords])].filter(term=>term.length>=3).slice(0,120)
+  const profileSkills=normalize(profile?.skills),profileFields=normalize(profile?.target_fields),headlineTokens=words(String(profile?.headline??'').toLowerCase())
+  const evidenceTerms=[...new Set([...profileSkills,...profileFields,...headlineTokens,...cvKeywords])].filter(term=>term.length>=3).slice(0,140)
   const candidates=(jobs??[]).map((job:any)=>{
     const jobSkills=normalize(job.skills),title=String(job.title??'').toLowerCase(),text=`${job.title??''} ${job.company??''} ${job.description??''} ${JSON.stringify(job.requirements??[])}`.toLowerCase()
     if(excluded.some(keyword=>keyword&&text.includes(keyword)))return null
@@ -26,12 +26,19 @@ Deno.serve(async(req:Request)=>{
     const matchedTerms=evidenceTerms.filter(term=>text.includes(term))
     const matchedSkills=jobSkills.filter((skill:string)=>evidence.has(skill)||resumeText.includes(skill))
     const missing=jobSkills.filter((skill:string)=>!evidence.has(skill)&&!resumeText.includes(skill)).slice(0,8)
-    const exactRole=targetRoles.some(role=>role&&title.includes(role))
+
+    const exactTitleRole=targetRoles.some(role=>role&&title.includes(role))
+    const exactTextRole=targetRoles.some(role=>role&&text.includes(role))
     const titleTokenHits=targetTokens.filter(token=>title.includes(token)).length
-    const roleCoverage=targetTokens.length?titleTokenHits/targetTokens.length:0
-    const roleScore=exactRole?40:Math.round(Math.min(1,roleCoverage)*35)
-    const skillScore=jobSkills.length?Math.round((matchedSkills.length/Math.max(jobSkills.length,1))*35):Math.round(Math.min(1,matchedTerms.length/10)*25)
-    const evidenceScore=Math.min(15,matchedTerms.length*2)
+    const textTokenHits=targetTokens.filter(token=>text.includes(token)).length
+    const titleCoverage=targetTokens.length?titleTokenHits/targetTokens.length:0
+    const textCoverage=targetTokens.length?textTokenHits/targetTokens.length:0
+    const roleScore=exactTitleRole?40:exactTextRole?32:Math.round(Math.max(titleCoverage*35,textCoverage*28))
+
+    const skillScore=jobSkills.length
+      ?Math.round((matchedSkills.length/Math.max(jobSkills.length,1))*30)
+      :Math.min(24,matchedTerms.length*4)
+    const evidenceScore=Math.min(18,matchedTerms.length*3)
     const recencyScore=job.posted_at&&Date.now()-new Date(job.posted_at).getTime()<14*86400000?5:0
     const remoteScore=job.fully_remote?5:0
     const fit=Math.max(0,Math.min(100,roleScore+skillScore+evidenceScore+recencyScore+remoteScore))

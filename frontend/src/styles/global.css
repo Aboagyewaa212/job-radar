@@ -297,3 +297,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--rose);box-shadow:0 0 
   .cookieNotice{flex-direction:column;align-items:stretch}
   .cookieActions{white-space:normal;flex-wrap:wrap;justify-content:flex-end}
 }
+
+.buttonSpinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;display:inline-block;animation:buttonSpin .7s linear infinite}
+@keyframes buttonSpin{to{transform:rotate(360deg)}}
+.reduceMotion .buttonSpinner{animation:none}
