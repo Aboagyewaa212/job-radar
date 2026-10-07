@@ -22,6 +22,6 @@ export default function LandingPage(){
       </section>
       <section className="landingClose"><RadrLogo inverse/><h2>Less scrolling. More deliberate applications.</h2><Link className="btn light" to="/auth?mode=signup">Create account</Link></section>
     </main>
-    <footer className="publicFooter"><span>RADR</span><nav aria-label="Legal"><Link to="/privacy">Privacy</Link><Link to="/terms">Terms</Link><Link to="/accessibility">Accessibility</Link></nav></footer>
+    <footer className="publicFooter"><span>RADR</span><nav aria-label="Legal"><Link to="/privacy">Privacy</Link><Link to="/terms">Terms</Link><Link to="/cookies">Cookies</Link><Link to="/accessibility">Accessibility</Link></nav></footer>
   </div>
 }
