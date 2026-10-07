@@ -11,6 +11,7 @@ export function useRadar(){
   const [appliedToday,setAppliedToday]=useState(0)
   const [dailyGoal,setDailyGoal]=useState(5)
   const bootstrapped=useRef<string|null>(null)
+  const MATCHER_VERSION='v8'
 
   const refresh=useCallback(async()=>{
     if(!user)return 0
@@ -43,12 +44,13 @@ export function useRadar(){
     if(bootstrapped.current===user.id){void refresh();return}
     bootstrapped.current=user.id
     void (async()=>{
-      const count=await refresh()
-      if(count===0){
-        const {error:matchError}=await supabase.functions.invoke('match-user-jobs',{body:{}})
-        if(matchError)setError(matchError.message)
-        else await refresh()
-      }
+      await refresh()
+      const refreshKey=`job-radar-match-refresh-${MATCHER_VERSION}-${user.id}`
+      if(sessionStorage.getItem(refreshKey)==='done')return
+      const {error:matchError}=await supabase.functions.invoke('match-user-jobs',{body:{}})
+      if(matchError){setError(matchError.message);return}
+      sessionStorage.setItem(refreshKey,'done')
+      await refresh()
     })()
   },[user,refresh])
 
