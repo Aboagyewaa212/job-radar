@@ -1,7 +1,6 @@
 import {Navigate,Route,Routes} from 'react-router-dom'
 import {ProtectedRoute} from './components/ProtectedRoute'
 import {OnboardingGate} from './components/OnboardingGate'
-import {CookieNotice} from './components/CookieNotice'
 import {DashboardLayout} from './layouts/DashboardLayout'
 import LandingPage from './pages/LandingPage'
 import PolicyPage from './pages/PolicyPage'
@@ -38,5 +37,4 @@ export default function App(){return <>
     </Route>
     <Route path="*" element={<Navigate to="/" replace/>}/>
   </Routes>
-  <CookieNotice/>
 </>}
