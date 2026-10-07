@@ -8,12 +8,12 @@ Implemented now:
 - Supabase email/password authentication and per-user onboarding
 - profiles, career preferences and private resume storage with RLS
 - PDF, DOCX and plain-text resume extraction with file-size and parser safeguards
-- personalized job matching, “why you match” evidence and skill gaps
+- personalized job matching, ESCO-backed skill/occupation enrichment, “why you match” evidence and skill gaps
 - saved jobs and application-stage tracking
 - configurable daily application goal with a hard server-side maximum of 5
-- truthful Resume Studio generation/fallback that does not invent credentials
+- OpenAI-assisted Resume Studio generation that does not invent credentials
 - browser-safe CORS/auth handling for user Edge Functions
-- verified ingestion from Remote OK and Arbeitnow with source attribution
+- verified ingestion from Remote OK, Arbeitnow and Remote.com with source attribution
 - duplicate prevention by `(source_id, external_id)`
 - Supabase Cron daily ingestion at 05:15 UTC with a dedicated Vault-backed cron token and a 6-hour server cooldown
 - server-side function usage limits and automatic usage-log retention cleanup
@@ -25,7 +25,7 @@ Implemented now:
 
 The first live ingestion smoke test completed successfully on 2026-09-10 and imported 699 feed records, resulting in 698 active deduplicated jobs.
 
-Still intentionally pending: outbound push/email notification delivery and additional provider-specific source adapters. AI-assisted resume/cover-letter generation is optional and only runs when a server-side AI provider key is configured; otherwise Job Radar uses the truthful structured fallback.
+Still intentionally pending: outbound push/email notification delivery and additional provider-specific source adapters that require separate provider approval or credentials. AI-assisted resume/cover-letter generation only runs when a server-side OpenAI API key is configured.
 
 ## Repository structure
 
