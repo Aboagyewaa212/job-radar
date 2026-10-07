@@ -20,7 +20,7 @@ export function useRadar(){
     const start=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate())).toISOString()
     const end=new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate()+1)).toISOString()
     const [jobsResult,countResult,preferencesResult]=await Promise.all([
-      supabase.from('jobs').select(`id,title,company,location,fully_remote,employment_type,salary,description,requirements,skills,application_url,canonical_url,application_method,application_email,application_instructions,posted_at,expires_at,last_verified_at,source_count,job_sources(name),user_job_matches!inner(fit_score,why_match,missing_skills),application_progress(saved,stage,applied_at,notes)`).order('posted_at',{ascending:false,nullsFirst:false}).limit(150),
+      supabase.from('jobs').select(`id,title,company,location,fully_remote,employment_type,salary,description,requirements,skills,application_url,canonical_url,application_method,application_email,application_instructions,posted_at,expires_at,last_verified_at,source_count,job_sources(name),user_job_matches!inner(fit_score,why_match,missing_skills),application_progress(saved,stage,applied_at,notes,next_step_label,next_step_at)`).order('posted_at',{ascending:false,nullsFirst:false}).limit(150),
       supabase.from('application_progress').select('job_id',{count:'exact',head:true}).gte('applied_at',start).lt('applied_at',end),
       supabase.from('preferences').select('daily_application_goal').eq('user_id',user.id).single(),
     ])
@@ -55,7 +55,7 @@ export function useRadar(){
   },[user,refresh])
 
   const runMatching=async()=>{const {error}=await supabase.functions.invoke('match-user-jobs',{body:{}});if(error)throw error;await refresh()}
-  const updateProgress=async(jobId:string,patch:{saved?:boolean;stage?:ApplicationStage;notes?:string|null})=>{
+  const updateProgress=async(jobId:string,patch:{saved?:boolean;stage?:ApplicationStage;notes?:string|null;next_step_label?:string|null;next_step_at?:string|null})=>{
     if(!user)throw new Error('Not signed in')
     const payload={user_id:user.id,job_id:jobId,...patch,updated_at:new Date().toISOString(),...(patch.stage==='applied'?{applied_at:new Date().toISOString()}:{})}
     const {error}=await supabase.from('application_progress').upsert(payload,{onConflict:'user_id,job_id'})
