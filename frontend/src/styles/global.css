@@ -400,3 +400,37 @@ input:focus,textarea:focus,select:focus{border-color:var(--rose);box-shadow:0 0 
   .profileDanger{align-items:flex-start;flex-direction:column}
   .profileSaveBar .btn{width:100%}
 }
+
+
+/* Settings page */
+.settingsPage{display:grid;gap:18px;max-width:1080px}
+.settingsSection{background:var(--surface);border:1px solid var(--line)}
+.settingsSectionTitle{display:flex;align-items:center;gap:10px;padding:20px 22px;border-bottom:1px solid var(--line)}
+.settingsSectionTitle h2{font-size:1rem;margin:0}
+.settingsList{display:grid}
+.settingsItem,.settingsToggle{display:flex;align-items:center;justify-content:space-between;gap:22px;padding:18px 22px;border-bottom:1px solid var(--line)}
+.settingsItem:last-child,.settingsToggle:last-child{border-bottom:0}
+.settingsItem>div,.settingsToggle>div{display:grid;gap:4px}
+.settingsItem b,.settingsToggle b{font-size:.92rem}
+.settingsItem span,.settingsToggle span{font-size:.82rem;opacity:.66;font-weight:400;line-height:1.45}
+.settingsToggle{cursor:pointer}
+.settingsToggle input{width:18px;height:18px;flex:0 0 auto}
+.settingsLink{text-decoration:underline;text-underline-offset:4px;font-size:.85rem;white-space:nowrap}
+.settingsLegalGrid{display:grid;grid-template-columns:repeat(4,1fr)}
+.settingsLegalGrid a{display:flex;align-items:center;gap:9px;padding:18px 22px;border-right:1px solid var(--line);font-size:.86rem}
+.settingsLegalGrid a:last-child{border-right:0}
+.settingsLegalGrid a:hover{background:var(--rose-soft)}
+.settingsMessage{padding:12px 14px;border:1px solid var(--line);background:#f1f7f2;font-size:.85rem}
+
+@media(max-width:760px){
+  .settingsItem,.settingsToggle{align-items:flex-start;flex-direction:column}
+  .settingsItem .btn{width:100%}
+  .settingsLegalGrid{grid-template-columns:1fr 1fr}
+  .settingsLegalGrid a:nth-child(2){border-right:0}
+  .settingsLegalGrid a:nth-child(-n+2){border-bottom:1px solid var(--line)}
+}
+@media(max-width:480px){
+  .settingsLegalGrid{grid-template-columns:1fr}
+  .settingsLegalGrid a{border-right:0;border-bottom:1px solid var(--line)}
+  .settingsLegalGrid a:last-child{border-bottom:0}
+}
