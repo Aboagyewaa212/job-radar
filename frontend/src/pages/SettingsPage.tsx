@@ -5,10 +5,13 @@ import {supabase} from '../services/supabase'
 import {useAuth} from '../hooks/useAuth'
 
 const REDUCED_MOTION_KEY='job-radar-reduced-motion'
+const THEME_KEY='job-radar-theme'
+type Theme='light'|'dark'|'system'
 
 export default function SettingsPage(){
   const{user}=useAuth()
   const[reducedMotion,setReducedMotion]=useState(()=>localStorage.getItem(REDUCED_MOTION_KEY)==='true')
+  const[theme,setTheme]=useState<Theme>(()=>(localStorage.getItem(THEME_KEY) as Theme)||'system')
   const[busy,setBusy]=useState('')
   const[message,setMessage]=useState('')
   const[error,setError]=useState('')
@@ -17,6 +20,19 @@ export default function SettingsPage(){
     document.documentElement.classList.toggle('reduceMotion',reducedMotion)
     localStorage.setItem(REDUCED_MOTION_KEY,String(reducedMotion))
   },[reducedMotion])
+
+  useEffect(()=>{
+    const root=document.documentElement
+    const media=window.matchMedia('(prefers-color-scheme: dark)')
+    const apply=()=>{
+      const dark=theme==='dark'||(theme==='system'&&media.matches)
+      root.dataset.theme=dark?'dark':'light'
+    }
+    apply()
+    localStorage.setItem(THEME_KEY,theme)
+    media.addEventListener('change',apply)
+    return()=>media.removeEventListener('change',apply)
+  },[theme])
 
   async function sendPasswordReset(){
     if(!user?.email||busy)return
@@ -108,6 +124,12 @@ export default function SettingsPage(){
       <section className="settingsSection">
         <div className="settingsSectionTitle"><Eye size={18}/><h2>Appearance & accessibility</h2></div>
         <div className="settingsList">
+          <div className="settingsItem">
+            <div><b>Theme</b><span>Choose how Job RADR looks.</span></div>
+            <div className="themeControl" role="group" aria-label="Theme">
+              {(['light','dark','system'] as Theme[]).map(option=><button key={option} type="button" className={theme===option?'active':''} onClick={()=>setTheme(option)}>{option[0].toUpperCase()+option.slice(1)}</button>)}
+            </div>
+          </div>
           <label className="settingsToggle">
             <div><b>Reduce motion</b><span>Turn off interface animations and transitions.</span></div>
             <input type="checkbox" checked={reducedMotion} onChange={e=>setReducedMotion(e.target.checked)}/>
