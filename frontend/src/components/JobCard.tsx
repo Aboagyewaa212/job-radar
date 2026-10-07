@@ -58,7 +58,7 @@ export function JobCard({job,onProgress}:{job:RadarJob;onProgress:(jobId:string,
       <button className="detailsButton" onClick={()=>setOpen(v=>!v)} aria-expanded={open}>Details <ChevronDown className={open?'rotated':''} size={15}/></button>
       <div className="primaryActions">
         {progress?.stage==='applied'?<span className="appliedPill">Applied</span>:<button className="btn secondary" onClick={()=>void onProgress(job.id,{stage:'applied'})}>Mark applied</button>}
-        {applicationUrl?<a className="btn primary" href={applicationUrl} target="_blank" rel="noopener noreferrer">Apply <ExternalLink size={14}/></a>:<span className="btn secondary" aria-disabled="true">Link unavailable</span>}
+        {applicationUrl?<a className="btn primary" href={applicationUrl} target="_blank" rel="noopener noreferrer">Apply <ExternalLink size={14}/></a>:<span className="btn secondary" aria-disabled="true">Application link unavailable</span>}
       </div>
     </div>
   </article>
