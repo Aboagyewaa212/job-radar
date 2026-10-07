@@ -82,15 +82,16 @@ export default function ResumePage(){
     ])
     if(resumeResult.error){setError(resumeResult.error.message);return}
     if(coverResult.error){setError(coverResult.error.message);return}
-    setDrafts({
-      resume:String(resumeResult.data?.content??''),
-      cover_letter:String(coverResult.data?.content??''),
-    })
+    const resumeMode=String(resumeResult.data?.generation_mode??'')
+    const coverMode=String(coverResult.data?.generation_mode??'')
+    const resumeContent=resumeMode==='structured'?'':String(resumeResult.data?.content??'')
+    const coverContent=coverMode==='structured'?'':String(coverResult.data?.content??'')
+    setDrafts({resume:resumeContent,cover_letter:coverContent})
     setGenerationModes({
-      resume:String(resumeResult.data?.generation_mode??''),
-      cover_letter:String(coverResult.data?.generation_mode??''),
+      resume:resumeContent?resumeMode:'',
+      cover_letter:coverContent?coverMode:'',
     })
-    if(coverResult.data?.content&&!resumeResult.data?.content)setActiveDocument('cover_letter')
+    if(coverContent&&!resumeContent)setActiveDocument('cover_letter')
     else setActiveDocument('resume')
   }
 
@@ -167,7 +168,7 @@ export default function ResumePage(){
       const content=String(data?.content??'').trim()
       if(!content)throw new Error('The assistant returned an empty draft.')
       setDrafts(current=>({...current,[mode]:content}))
-      setGenerationModes(current=>({...current,[mode]:String(data?.generationMode??'structured')}))
+      setGenerationModes(current=>({...current,[mode]:String(data?.generationMode??'openai')}))
     }catch(error){
       setError(error instanceof Error?error.message:'Could not generate the document')
     }finally{
@@ -306,7 +307,7 @@ export default function ResumePage(){
           </div>
 
           <div className="documentToolbar">
-            <div><b>{activeDocument==='resume'?'Tailored CV':'Cover letter'}</b>{activeMode&&<span>{activeMode==='openai'?'AI-assisted':'Structured draft'}</span>}</div>
+            <div><b>{activeDocument==='resume'?'Tailored CV':'Cover letter'}</b>{activeMode&&<span>{activeMode==='openai'?'AI-assisted':'Edited draft'}</span>}</div>
             <div className="assistantActions">
               <button className="btn secondary" type="button" disabled={saving} onClick={()=>void saveDraft()}>{saving?'Saving…':'Save edits'}</button>
               <button className="btn secondary" type="button" onClick={downloadDraft}><Download size={14}/>Download</button>
