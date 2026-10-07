@@ -19,7 +19,7 @@ export default function DashboardPage(){
       <section className="dashboardPanel">
         <div className="panelHeading"><h2>Today</h2><span>{appliedToday}/{dailyGoal} applications</span></div>
         <div className="progressTrack" aria-label={`${appliedToday} of ${dailyGoal} daily applications completed`}><span style={{width:`${Math.min(100,(appliedToday/dailyGoal)*100)}%`}}/></div>
-        <p>{Math.max(0,dailyGoal-appliedToday)} quality applications left before your daily cap.</p>
+        <p>{Math.max(0,dailyGoal-appliedToday)} quality applications left to reach your daily goal.</p>
         <Link className="textLink" to="/radar">Open RADR →</Link>
       </section>
       <section className="dashboardPanel">

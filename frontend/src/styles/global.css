@@ -270,3 +270,28 @@ input:focus,textarea:focus,select:focus{border-color:var(--rose);box-shadow:0 0 
   .settingsRows>div{grid-template-columns:1fr;gap:8px}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+
+/* responsive usability fixes */
+.reduceMotion *{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+.stageControl{margin-top:7px;font-size:.72rem;font-weight:600}
+.stageControl select{margin-top:4px;padding:8px 9px;font-size:.8rem}
+
+@media(max-width:780px){
+  .appShell{display:block}
+  .sidebar{position:sticky;top:0;height:auto;min-height:0;padding:8px 10px;flex-direction:row;align-items:center;gap:8px;overflow-x:auto;overscroll-behavior-x:contain}
+  .sidebarBrand{padding:4px 8px;flex:0 0 auto}
+  .sidebarBrand .radrWord{display:none}
+  .sidebarNav,.sidebarUtility{display:flex;gap:4px;flex:0 0 auto}
+  .sidebarUtility{margin-top:0;border-top:0;padding-top:0}
+  .sidebarNav a,.sidebarUtility a,.sidebarUtility button{width:auto;min-height:38px;padding:9px 10px;font-size:.78rem;text-align:center;white-space:nowrap;border-left:0;border-bottom:3px solid transparent}
+  .sidebarNav a:before,.sidebarUtility a:before,.sidebarUtility button:before{content:none}
+  .sidebarNav a.active,.sidebarUtility a.active{border-left-color:transparent;border-bottom-color:var(--rose)}
+}
+
+@media(max-width:560px){
+  .jobHeading{align-items:flex-start}
+  .actions .btn{flex:1 1 auto}
+  .cookieNotice{flex-direction:column;align-items:stretch}
+  .cookieActions{white-space:normal;flex-wrap:wrap;justify-content:flex-end}
+}
